@@ -1,6 +1,6 @@
 var intVal = undefined;
 
-var intValSecs = 10;
+var intValSecs = 60;
 
 exports.testInterval = (message, bot) => {
   if(intVal === undefined) {
