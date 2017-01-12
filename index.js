@@ -1,8 +1,16 @@
-var Botkit = require('botkit')
+// forked from: https://github.com/BeepBoopHQ/starter-node-bot/blob/master/index.js
 
-var token = process.env.SLACK_TOKEN
+const Botkit = require('botkit');
 
-var controller = Botkit.slackbot({
+const PushUtils = require('./push_messages/push-utils');
+
+const scriptManager = require('./push_messages/script-manager');
+
+const intTester = require('./test-interval');
+
+const token = process.env.SLACK_TOKEN
+
+const controller = Botkit.slackbot({
   // reconnect to Slack RTM when connection goes bad
   retry: Infinity,
   debug: false
@@ -27,51 +35,68 @@ if (token) {
   require('beepboop-botkit').start(controller, { debug: true })
 }
 
-controller.on('bot_channel_join', function (bot, message) {
-  bot.reply(message, "I'm here!")
+controller.hears(['start script'], ['direct_mention', 'direct_message'], function (bot, message) {
+  var lookFor = message.text.substring('start script'.length);
+  if(lookFor.startsWith(' ')) {
+    lookFor = lookFor.substring(1);
+  }
+
+  var scripts = scriptManager.getScripts();
+
+  if(scripts[lookFor] === undefined) {
+    bot.reply(message, 'Starting Class Listener Script with class: `'+lookFor+'`');
+
+    PushUtils.classOpening(lookFor);
+  } else {
+    bot.reply(message, 'Script already running for: `'+lookFor+'`');
+  }
 })
 
-controller.hears(['hello', 'hi'], ['direct_mention'], function (bot, message) {
-  bot.reply(message, 'Hello.')
+controller.hears(['status'], ['direct_mention', 'direct_message'], function (bot, message) {
+  var scriptPP = '';
+
+  var scripts = scriptManager.getScripts();
+
+  for(var lookFor in scripts) {
+    scriptPP+=lookFor+'\n';
+  }
+
+  bot.reply(message, 'Current Scripts:\n'+scriptPP);
 })
 
-controller.hears(['hello', 'hi'], ['direct_message'], function (bot, message) {
-  bot.reply(message, 'Hello.')
-  bot.reply(message, 'It\'s nice to talk to you directly.')
+controller.hears(['stop script'], ['direct_mention', 'direct_message'], function (bot, message) {
+  var lookFor = message.text.substring('start script'.length);
+  if(lookFor.startsWith(' ')) {
+    lookFor = lookFor.substring(1);
+  }
+
+  var scripts = scriptManager.getScripts();
+
+  if(scripts[lookFor] === undefined) {
+    bot.reply(message, 'No script running for: `'+lookFor+'`');
+  } else {
+    bot.reply(message, 'Stopping script: `'+lookFor+'`');
+
+    scriptManager.endScript(lookFor);
+  }
 })
 
-controller.hears('.*', ['mention'], function (bot, message) {
-  bot.reply(message, 'You really do care about me. :heart:')
+controller.hears(['test interval'], ['direct_mention', 'direct_message'], function (bot, message) {
+  intTester.testInterval(message, bot);
 })
 
-controller.hears('help', ['direct_message', 'direct_mention'], function (bot, message) {
-  var help = 'I will respond to the following messages: \n' +
-      '`bot hi` for a simple message.\n' +
-      '`bot attachment` to see a Slack attachment message.\n' +
-      '`@<your bot\'s name>` to demonstrate detecting a mention.\n' +
-      '`bot help` to see this again.'
-  bot.reply(message, help)
+controller.hears(['stop interval'], ['direct_mention', 'direct_message'], function (bot, message) {
+  intTester.stopInterval(message, bot);
 })
 
-controller.hears(['attachment'], ['direct_message', 'direct_mention'], function (bot, message) {
-  var text = 'Beep Beep Boop is a ridiculously simple hosting platform for your Slackbots.'
-  var attachments = [{
-    fallback: text,
-    pretext: 'We bring bots to life. :sunglasses: :thumbsup:',
-    title: 'Host, deploy and share your bot in seconds.',
-    image_url: 'https://storage.googleapis.com/beepboophq/_assets/bot-1.22f6fb.png',
-    title_link: 'https://beepboophq.com/',
-    text: text,
-    color: '#7CD197'
-  }]
+controller.hears(['test push'], ['direct_mention', 'direct_message'], function (bot, message) {
+  bot.reply(message, 'Testing push message with random value: '+PushUtils.testPush());
+})
 
-  bot.reply(message, {
-    attachments: attachments
-  }, function (err, resp) {
-    console.log(err, resp)
-  })
+controller.hears(['help'], ['direct_mention', 'direct_message'], function (bot, message) {
+  bot.reply(message, 'Help Table:\n`test interval` : start running an interval test\n`stop interval` : stop the interval tests\n`start script <class code, e.g. MATH 2930-203>` : start the class listener\n`test push` : send a test message\n`status` : see the current script status\n`stop script <class code>` : stop the script');
 })
 
 controller.hears('.*', ['direct_message', 'direct_mention'], function (bot, message) {
-  bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n')
+  bot.reply(message, 'Sorry <@' + message.user + '>, I don\'t understand. \n');
 })

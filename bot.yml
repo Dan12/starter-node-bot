@@ -1,21 +1,16 @@
 name: nodebot
 description: A simple node.js starter bot for Beep Boop
 avatar: resources/avatar.png
-#background: resources/background.png
 config:
 - name: API_KEY
   friendly_name: api key
   info: this is the firebase api key
   type: secret
-#  - name: OPTION
-#    friendly_name: Some Unnecessary Option
-#    info: This is an unnecessary option
-#    default: the default value
-#  - name: SECRET
-#    friendly_name: Shhhh
-#    info: This is an secret option
-#    type: secret
-#    default: not secret though
-#screenshots:
-#  - screenshot: resources/screenshot1.png
-#  - screenshot: resources/screenshot2.jpg
+- name: COOKIE
+  friendly_name: cookie
+  info: this is the cornell cookie string
+  type: secret
+- name: DEVICE
+  friendly_name: device
+  info: this is device token
+  type: secret
