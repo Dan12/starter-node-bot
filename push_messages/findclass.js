@@ -4,6 +4,8 @@ const log = require('./log');
 const envVars = require('./envVar');
 const scriptManager = require('./script-manager');
 
+const bot_messenger = require('./bot_messenger');
+
 var cookie = envVars.cookie;
 cookie = cookie.trim();
 
@@ -19,6 +21,8 @@ var sendPush = (msg, name) => {
   log.log(msg);
   console.log(msg);
   messenger.sendMessageToUser(msg);
+
+  bot_messenger.send_message(msg);
 
   scriptManager.endScript(name)
 }

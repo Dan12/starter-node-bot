@@ -8,6 +8,8 @@ const scriptManager = require('./push_messages/script-manager');
 
 const intTester = require('./test-interval');
 
+const bot_messenger = require('./push_messages/bot_messenger');
+
 const token = process.env.SLACK_TOKEN
 
 const controller = Botkit.slackbot({
@@ -47,6 +49,7 @@ controller.hears(['start script'], ['direct_mention', 'direct_message'], functio
     bot.reply(message, 'Starting Class Listener Script with class: `'+lookFor+'`');
 
     PushUtils.classOpening(lookFor);
+    bot_messenger.set_bot(bot, message);
   } else {
     bot.reply(message, 'Script already running for: `'+lookFor+'`');
   }
