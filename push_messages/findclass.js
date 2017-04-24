@@ -46,7 +46,7 @@ var sendRequest = (name) => {
   // An object of options to indicate where to post to
   var options = {
       host: 'css.adminapps.cornell.edu',
-      path: '/psc/cuselfservice/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL',
+      path: '/psc/cuselfservice/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_CART.GBL?Page=SSR_SSENRL_CART&Action=A&ACAD_CAREER=UG&EMPLID=3873235&INSTITUTION=CUNIV&STRM=2678&TargetFrameName=None',
       method: 'GET',
       headers: {
         "Cookie": cookie
