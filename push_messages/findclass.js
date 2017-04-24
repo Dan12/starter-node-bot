@@ -13,7 +13,7 @@ var imgSrc = '<img src="';
 var openImg = "/cs/cuselfservice/cache/PS_CS_STATUS_OPEN_ICN_1.gif";
 
 // time in minutes between checks
-var minsBetweenChecks = .5;
+var minsBetweenChecks = .25;
 
 var sendPush = (msg, name) => {
   log.log(msg);
